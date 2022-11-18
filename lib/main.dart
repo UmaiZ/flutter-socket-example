@@ -59,11 +59,14 @@ class _MyHomePageState extends State<MyHomePage> {
       // Handle socket events
       socket.on('connect', (_) {
         print('connect: ${socket.id}');
-        socket.emit('getRoomChats', {'roomID': 1});
+        socket.emit('getRoomChats', {'roomid': "63772c5ff4048eea6899f437"});
+
+        socket.emit('messageseen',
+            {'roomid': "63772c5ff4048eea6899f437", "partner": "umaizid2"});
 
         socket.on('messagerecieved', (data) {
           setState(() {
-            chatList = data['chats'];
+            chatList = data;
           });
         });
       });
@@ -89,18 +92,25 @@ class _MyHomePageState extends State<MyHomePage> {
                 itemCount: chatList.length,
                 itemBuilder: (context, i) {
                   return Align(
-                    alignment: chatList[i]['username'] == "Sana"
+                    alignment: chatList[i]['partner'] == "umaizid2"
                         ? Alignment.bottomRight
                         : Alignment.bottomLeft,
-                    child: Container(
-                      decoration: BoxDecoration(color: Colors.blue),
-                      child: Padding(
-                        padding: const EdgeInsets.all(13.0),
-                        child: Text(
-                          "${chatList[i]['username']} := ${chatList[i]['message']}",
-                          style: TextStyle(color: Colors.white),
+                    child: Column(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(color: Colors.blue),
+                          child: Padding(
+                            padding: const EdgeInsets.all(13.0),
+                            child: Text(
+                              "${chatList[i]['partner']} := ${chatList[i]['message']}",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
                         ),
-                      ),
+                        chatList[i]['lastSeen']
+                            ? Icon(Icons.done_all)
+                            : Icon(Icons.done),
+                      ],
                     ),
                   );
                 },
@@ -120,8 +130,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       onTap: () {
                         socket.emit('sendMessage', {
                           'message': _messageController.text,
-                          'username': 'Sana',
-                          'roomID': 1
+                          'partner': 'umaizid2',
+                          'roomid': "63772c5ff4048eea6899f437"
                         });
                         _messageController.clear();
                       },
